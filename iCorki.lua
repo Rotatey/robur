@@ -8,21 +8,14 @@ clean.module("iCorki", package.seeall, log.setup)
 -- Globals
 local CoreEx = _G.CoreEx
 local Libs = _G.Libs
-local mathRad = _G.math.rad
-local tInsert = _G.table.insert
 
 local Geometry = CoreEx.Geometry
-local BestCoveringCone = Geometry.BestCoveringCone
 
 local Menu = Libs.NewMenu
-local Prediction = Libs.Prediction
 local Orbwalker = Libs.Orbwalker
-local CollisionLib = Libs.CollisionLib
 local DamageLib = Libs.DamageLib
-local ImmobileLib = Libs.ImmobileLib
 local SpellLib = Libs.Spell
 local TS = Libs.TargetSelector()
-local HealthPrediction = Libs.HealthPred
 
 local ObjectManager = CoreEx.ObjectManager
 local EventManager = CoreEx.EventManager
@@ -34,24 +27,12 @@ local Renderer = CoreEx.Renderer
 
 local SpellSlots = Enums.SpellSlots
 local SpellStates = Enums.SpellStates
-local BuffTypes = Enums.BuffTypes
 local Events = Enums.Events
-local HitChance = Enums.HitChance
 local HitChanceStrings = { "Collision", "OutOfRange", "VeryLow", "Low", "Medium", "High", "VeryHigh", "Dashing", "Immobile" };
 
 local LocalPlayer = ObjectManager.Player.AsHero
 
 if LocalPlayer.CharName ~= "Corki" then return false end
-
-local smiteSpell = nil
--- Check if Player has smite
-if string.find(string.lower(LocalPlayer:GetSpell(SpellSlots.Summoner1).Name), "flash") then
-    smiteSpell = SpellSlots.Summoner1
-elseif string.find(string.lower(LocalPlayer:GetSpell(SpellSlots.Summoner2).Name), "flash") then
-    smiteSpell = SpellSlots.Summoner2
-end
-
-if smiteSpell == nil then return false end
 
 -- Globals
 local Corki = {}
@@ -96,20 +77,16 @@ Corki.R = SpellLib.Skillshot({
 
 -- Utils
 function Utils.IsGameAvailable()
-    -- Is game available to automate stuff
     return not (Game.IsChatOpen() or Game.IsMinimized() or LocalPlayer.IsDead)
 end
 
 function Utils.IsInRange(From, To, Min, Max)
-    -- Is Target in range
     local Distance = From:Distance(To)
     return Distance > Min and Distance <= Max
 end
 
 function Utils.GetBoundingRadius(Target)
     if not Target then return 0 end
-
-    -- Bounding boxes
     return LocalPlayer.BoundingRadius + Target.BoundingRadius
 end
 
@@ -118,7 +95,6 @@ function Utils.IsValidTarget(Target)
 end
 
 function Utils.TargetsInRange(Target, Range, Team, Type, Condition)
-    -- return target in range
     local Objects = ObjectManager.Get(Team, Type)
     local Array = {}
     local Index = 0
@@ -148,10 +124,6 @@ end
 
 function Utils.IsBigUlt()
     return LocalPlayer:GetBuff("mbcheck2")
-end
-
-function Utils.TotalDamage(Target)
-    return 0
 end
 
 function Utils.CalculateQDamage(Target)
@@ -307,13 +279,10 @@ function Corki.LoadMenu()
 end
 
 function Corki.OnDraw()
-    -- If player is not on screen than don't draw
     if not LocalPlayer.IsOnScreen then return false end;
 
-    -- Get spells ranges
     local Spells = { Q = Corki.Q, E = Corki.E, R = Corki.R }
 
-    -- Draw them all
     for k, v in pairs(Spells) do
         if Menu.Get("Drawings." .. k) then
             Renderer.DrawCircle3D(LocalPlayer.Position, v.Range, 30, 1, 0xFF31FFFF)
@@ -331,9 +300,7 @@ function Corki.OnTick()
     local OrbwalkerLogic = Corki.Logic[OrbwalkerMode]
 
     if OrbwalkerLogic then
-        -- Calculate spell data
 
-        -- Do logic
         if OrbwalkerLogic() then return true end
     end
 

@@ -299,18 +299,11 @@ function Corki.LoadMenu()
         Menu.Separator()
         Menu.Separator()
         Menu.NewTree("Drawings", "Drawings", function()
-            Menu.Checkbox("Drawing.Damage", "Draw Damage", false)
             Menu.Checkbox("Drawings.Q", "Draw Q Range", true)
             Menu.Checkbox("Drawings.E", "Draw E Range", true)
             Menu.Checkbox("Drawings.R", "Draw R Range", true)
         end)
     end)
-end
-
-function Corki.OnDrawDamage(target, dmgList)
-    if Menu.Get("Drawing.Damage") then
-        table.insert(dmgList, Utils.TotalDamage(target))
-    end
 end
 
 function Corki.OnDraw()
